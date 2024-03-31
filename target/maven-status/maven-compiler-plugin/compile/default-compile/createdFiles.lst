@@ -1,0 +1,14 @@
+br\com\cdb\BancoDigitalJPA\BancoDigitalJpaApplication.class
+br\com\cdb\BancoDigitalJPA\repository\ClienteRepository.class
+br\com\cdb\BancoDigitalJPA\service\ClienteService.class
+br\com\cdb\BancoDigitalJPA\entity\Cliente.class
+br\com\cdb\BancoDigitalJPA\controller\ClienteController.class
+br\com\cdb\BancoDigitalJPA\controller\ContaController.class
+br\com\cdb\BancoDigitalJPA\entity\TipoCliente.class
+br\com\cdb\BancoDigitalJPA\entity\TipoConta.class
+br\com\cdb\BancoDigitalJPA\entity\Cartao.class
+br\com\cdb\BancoDigitalJPA\service\ContaService.class
+br\com\cdb\BancoDigitalJPA\entity\TipoCartao.class
+br\com\cdb\BancoDigitalJPA\repository\ContaRepository.class
+br\com\cdb\BancoDigitalJPA\entity\Conta.class
+br\com\cdb\BancoDigitalJPA\entity\StreamsCliente.class
