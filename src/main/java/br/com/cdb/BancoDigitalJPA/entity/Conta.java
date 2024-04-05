@@ -34,6 +34,8 @@ public class Conta {
     @Enumerated(EnumType.STRING)
     private TipoConta tipoConta;
     private LocalDate dataCriacao;
+    private String chavePix;
+    private String senha;
 
     public Conta() {
     }
@@ -84,7 +86,23 @@ public class Conta {
     public void setDataCriacao(LocalDate dataCriacao) {
         this.dataCriacao = dataCriacao;
     }
-    
-    
 
+    public String getChavePix() {
+        return chavePix;
+    }
+
+    public void setChavePix(String chavePix) {
+        this.chavePix = chavePix;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+    
+    
+    
 }

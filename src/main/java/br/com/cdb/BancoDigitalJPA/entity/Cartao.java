@@ -4,6 +4,7 @@
  */
 package br.com.cdb.BancoDigitalJPA.entity;
 
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +21,8 @@ import jakarta.persistence.ManyToOne;
  * @author mathe
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_cartao")
 public abstract class Cartao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,18 +31,20 @@ public abstract class Cartao {
     private boolean ativo;
     private String senha;
     @ManyToOne
-    @JoinColumn(name = "conta_ID")
     private Conta conta;
 
     public Cartao() {
     }
 
-    public Cartao(Long numero, String senha, Conta conta, boolean ativo) {
+    public Cartao(Long id, Long numero, boolean ativo, String senha, Conta conta) {
+        this.id = id;
         this.numero = numero;
+        this.ativo = ativo;
         this.senha = senha;
         this.conta = conta;
-        this.ativo = ativo;
     }
+
+   
 
     public Long getNumero() {
         return numero;

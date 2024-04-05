@@ -7,6 +7,10 @@ package br.com.cdb.BancoDigitalJPA.service;
 import br.com.cdb.BancoDigitalJPA.entity.Cliente;
 import br.com.cdb.BancoDigitalJPA.entity.Conta;
 import br.com.cdb.BancoDigitalJPA.entity.TipoConta;
+import br.com.cdb.BancoDigitalJPA.exception.ChavePixNaoEncontradaException;
+import br.com.cdb.BancoDigitalJPA.exception.ContaNotFoundException;
+import br.com.cdb.BancoDigitalJPA.exception.SaldoInsuficienteException;
+import br.com.cdb.BancoDigitalJPA.exception.SenhaIncorretaException;
 
 import br.com.cdb.BancoDigitalJPA.repository.ContaRepository;
 import java.time.LocalDate;
@@ -32,7 +36,7 @@ public class ContaService {
     @Autowired
     private ContaRepository contaRepository;
 
-    public Conta salvarConta(Cliente cliente, TipoConta tipoConta) {
+    public Conta salvarConta(Cliente cliente, TipoConta tipoConta, String chavePix, String senha) {
         Conta conta = new Conta();
         Random random = new Random();
         conta.setNumeroConta(random.nextLong((1 * Long.SIZE), Long.MAX_VALUE));
@@ -41,6 +45,8 @@ public class ContaService {
         conta.setTipoConta(tipoConta);
         LocalDate today = LocalDate.now();
         conta.setDataCriacao(today);
+        conta.setChavePix(chavePix);
+        conta.setSenha(senha);
         return contaRepository.save(conta);
     }
 
@@ -54,15 +60,51 @@ public class ContaService {
         LocalDate today = LocalDate.now();
         Period period = Period.between(dataInicioAtividades, today);
         int diasCorridos = period.getDays();
-       
+
         if (diasCorridos % 30 == 0 && conta.getTipoConta().equals(TipoConta.CONTACORRENTE)) {
             conta.setSaldoConta(conta.getSaldoConta() - 22.90);
         } else if (diasCorridos % 30 == 0 && conta.getTipoConta().equals(TipoConta.CONTAPOUPANCA)) {
-            conta.setSaldoConta(conta.getSaldoConta() + (conta.getSaldoConta()+ 0.08));
+            conta.setSaldoConta(conta.getSaldoConta() + (conta.getSaldoConta() + 0.08));
         }
 
         // Salva a conta atualizada no banco de dados
         return contaRepository.save(conta);
     }
 
+    public Conta transferirViaPix(Long numeroConta, String chavePix, double valor, String senha) {
+        Conta contaOrigem = contaRepository.findByNumeroConta(numeroConta);
+        if (contaOrigem.getSenha().equals(senha)) {
+
+            if (contaOrigem.getSaldoConta() >= valor) {
+                Conta contaDestino = contaRepository.findByChavePix(chavePix);
+                if (contaDestino != null) {
+
+                    contaDestino.setSaldoConta(contaDestino.getSaldoConta() + valor);
+                    contaOrigem.setSaldoConta(contaOrigem.getSaldoConta() - valor);
+                    contaRepository.save(contaOrigem);
+                    return contaRepository.save(contaDestino);
+                } else {
+                    throw new ChavePixNaoEncontradaException("Chave pix não encontrada!");
+                }
+            } else {
+                throw new SaldoInsuficienteException("Saldo insuficiente para realizar a transferência");
+            }
+        } else {
+            throw new SenhaIncorretaException("Senha incorreta, impossivel realizar trasferência!");
+
+        }
+    }
+
+    public Conta buscarContaPorNumero(Long numeroConta) {
+        Conta conta = contaRepository.findByNumeroConta(numeroConta);
+        
+        if(conta != null){
+            return conta;
+        }else{
+            throw new ContaNotFoundException("Conta não encontrada.");
+        }
+    }
+    
+    
+    
 }

@@ -4,6 +4,7 @@
  */
 package br.com.cdb.BancoDigitalJPA.entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,20 +16,20 @@ import java.util.Date;
  * @author mathe
  */
 @Entity
+@DiscriminatorValue("credito")
 public class CartaoCredito extends Cartao {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private Date dataFatura;
     private double limiteDoCartao;
 
     public CartaoCredito() {
     }
 
-    public CartaoCredito(Long numero, String senha, Conta conta, boolean ativo) {
-        super(numero, senha, conta, ativo);
+    public CartaoCredito(Long id, Long numero, boolean ativo, String senha, Conta conta) {
+        super(id, numero, ativo, senha, conta);
     }
+    
+ 
 
     public Date getDataFatura() {
         return dataFatura;

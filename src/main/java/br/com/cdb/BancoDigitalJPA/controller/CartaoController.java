@@ -6,6 +6,7 @@ package br.com.cdb.BancoDigitalJPA.controller;
 
 import br.com.cdb.BancoDigitalJPA.entity.Cartao;
 import br.com.cdb.BancoDigitalJPA.entity.CartaoCredito;
+import br.com.cdb.BancoDigitalJPA.entity.CartaoDebito;
 import br.com.cdb.BancoDigitalJPA.service.CartaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,19 @@ public class CartaoController {
     
    @PostMapping("/addCartaoCredito")
     public ResponseEntity<String> addCartao(@RequestBody CartaoCredito cartao) {
-        int operacao = 1;
+   
+        Cartao cartaoAdicionado = cartaoService.salvarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
+        if (cartaoAdicionado != null) {
+            return new ResponseEntity<>("Conta adicionada com sucesso!",
+                    HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("Um dos campos da conta é inválido!",
+                    HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+    @PostMapping("/addCartaoDebito")
+    public ResponseEntity<String> addCartao(@RequestBody CartaoDebito cartao) {
+     
         Cartao cartaoAdicionado = cartaoService.salvarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
         if (cartaoAdicionado != null) {
             return new ResponseEntity<>("Conta adicionada com sucesso!",
