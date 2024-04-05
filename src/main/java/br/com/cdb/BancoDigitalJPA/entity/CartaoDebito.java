@@ -6,9 +6,6 @@ package br.com.cdb.BancoDigitalJPA.entity;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 /**
  *
@@ -18,7 +15,7 @@ import jakarta.persistence.Id;
 @DiscriminatorValue("debito")
 public class CartaoDebito extends Cartao {
 
-    private final double limiteDiario = 1000;
+    private double limiteDiario;
 
     public CartaoDebito() {
     }
@@ -27,6 +24,13 @@ public class CartaoDebito extends Cartao {
         super(id, numero, ativo, senha, conta);
     }
 
-    
+    public double getLimiteDiario() {
+        return limiteDiario;
+    }
 
+    public void setLimiteDiario(double limiteDiario) {
+        this.limiteDiario = limiteDiario;
+    }
+    
+    
 }
