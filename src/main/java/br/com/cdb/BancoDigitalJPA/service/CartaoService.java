@@ -24,10 +24,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CartaoService {
-
+    
     @Autowired
     private CartaoRepository cartaoRepository;
-
+    
     public Cartao salvarCartao(Class<? extends Cartao> tipoCartao, String senha, Conta conta) {
         Random random = new Random();
         if (CartaoCredito.class.equals(tipoCartao)) {
@@ -47,6 +47,7 @@ public class CartaoService {
             CartaoDebito cartaoDebito = new CartaoDebito();
             cartaoDebito.setNumero(random.nextLong((1 * Long.SIZE), Long.MAX_VALUE));
             cartaoDebito.setAtivo(true);
+            cartaoDebito.setLimiteDiario(1000.00);
             cartaoDebito.setSenha(senha);
             cartaoDebito.setConta(conta);
             return cartaoRepository.save(cartaoDebito);
@@ -54,7 +55,7 @@ public class CartaoService {
             return null;
         }
     }
-
+    
     public Cartao realizarPagamentos(Long numeroCartao, String senha, String numeroBoleto) {
         Cartao cartao = cartaoRepository.findByNumero(numeroCartao);
         // Nessa classe, implementariamos uma função de pagar algo a partir de uma requisição externa
@@ -96,7 +97,7 @@ public class CartaoService {
             }
         }
     }
-
+    
     public Cartao mudarSenha(Long id, String antigaSenha, String novaSenha, String novaSenhaConfirm) {
         Optional<Cartao> cartaoOptional = cartaoRepository.findById(id);
         if (cartaoOptional.isPresent()) {
@@ -115,11 +116,11 @@ public class CartaoService {
             throw new RuntimeException("Cartao não encontrado!!");
         }
     }
-
+    
     public Cartao ativarCartao(Long id, String senha, boolean ativar) {
         Optional<Cartao> cartaoOptional = cartaoRepository.findById(id);
         if (cartaoOptional.isPresent()) {
-
+            
             Cartao cartao = cartaoOptional.get();
             if (cartao.getSenha().equals(senha)) {
                 cartao.setAtivo(ativar);
@@ -131,5 +132,29 @@ public class CartaoService {
             throw new RuntimeException("Cartao não encontrado!!");
         }
     }
-
+    
+    public Cartao ajustarLimite(Long id, String senha, double limite) {
+        Optional<Cartao> cartaoOptional = cartaoRepository.findById(id);
+        
+        if (cartaoOptional.isPresent()) {
+            Cartao cartao = cartaoOptional.get();
+            if (cartao.getSenha().equals(senha)) {
+                if (cartao instanceof CartaoCredito) {
+                    CartaoCredito cartaoCredito = (CartaoCredito) cartao;
+                    cartaoCredito.setLimiteDoCartao(limite);
+                } else if (cartao instanceof CartaoDebito) {
+                    CartaoDebito cartaoDebito = (CartaoDebito) cartao;
+                    cartaoDebito.setLimiteDiario(limite);
+                } else {
+                    throw new RuntimeException("Tipo de cartao não suportado!!");
+                }
+                return cartaoRepository.save(cartao);
+            } else {
+                throw new SenhaIncorretaException("Senha incorreta!!");
+            }
+        } else {
+            throw new RuntimeException("Cartao não encontrado!!");
+        }
+    }
+    
 }

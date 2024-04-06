@@ -7,7 +7,6 @@ package br.com.cdb.BancoDigitalJPA.controller;
 import br.com.cdb.BancoDigitalJPA.entity.Cartao;
 import br.com.cdb.BancoDigitalJPA.entity.CartaoCredito;
 import br.com.cdb.BancoDigitalJPA.entity.CartaoDebito;
-import br.com.cdb.BancoDigitalJPA.exception.SaldoInsuficienteException;
 import br.com.cdb.BancoDigitalJPA.exception.SenhaIncorretaException;
 import br.com.cdb.BancoDigitalJPA.service.CartaoService;
 import java.util.Map;
@@ -118,10 +117,19 @@ public class CartaoController {
         }
     }
 
-//    @PostMapping("/alterarLimite")
-//    public ResponseEntity<String> alterarLimite(@RequestBody Map<String, Object> request) {
-//        Long id = Long.valueOf((Integer) request.get("id"));
-//        String senha = (String) request.get("senha");
-//    }
+    @PostMapping("/alterarLimite")
+    public ResponseEntity<String> alterarLimite(@RequestBody Map<String, Object> request) {
+        Long id = Long.valueOf((Integer) request.get("id"));
+        String senha = (String) request.get("senha");
+        Double limite = Double.valueOf((Double) request.get("limite"));
+        try {
+            Cartao cartao = cartaoService.ajustarLimite(id, senha, limite);
+            return new ResponseEntity<>("limite alterado com sucesso!!", HttpStatus.OK);
+        } catch (SenhaIncorretaException e) {
+            return new ResponseEntity<>("Senha incorreta! Não foi possível ativar o cartão.", HttpStatus.UNAUTHORIZED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 
 }

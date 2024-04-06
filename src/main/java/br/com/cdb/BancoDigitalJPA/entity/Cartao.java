@@ -44,7 +44,10 @@ public abstract class Cartao {
         this.conta = conta;
     }
 
-   
+    
+    public Long getId() {
+        return id;
+    }
 
     public Long getNumero() {
         return numero;
