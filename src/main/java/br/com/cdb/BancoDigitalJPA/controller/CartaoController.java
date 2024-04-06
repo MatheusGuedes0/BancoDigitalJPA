@@ -32,7 +32,7 @@ public class CartaoController {
     @PostMapping("/addCartaoCredito")
     public ResponseEntity<String> addCartao(@RequestBody CartaoCredito cartao) {
 
-        Cartao cartaoAdicionado = cartaoService.salvarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
+        Cartao cartaoAdicionado = cartaoService.criarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
         if (cartaoAdicionado != null) {
             return new ResponseEntity<>("Conta adicionada com sucesso!",
                     HttpStatus.CREATED);
@@ -45,7 +45,7 @@ public class CartaoController {
     @PostMapping("/addCartaoDebito")
     public ResponseEntity<String> addCartao(@RequestBody CartaoDebito cartao) {
 
-        Cartao cartaoAdicionado = cartaoService.salvarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
+        Cartao cartaoAdicionado = cartaoService.criarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
         if (cartaoAdicionado != null) {
             return new ResponseEntity<>("Conta adicionada com sucesso!",
                     HttpStatus.CREATED);

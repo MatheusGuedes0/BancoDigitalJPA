@@ -23,11 +23,6 @@ public enum TipoCliente {
         return tipoCliente;
     }
 
-    @Override
-    public String toString() {
-        return tipoCliente;
-    }
-    
     
     
 }

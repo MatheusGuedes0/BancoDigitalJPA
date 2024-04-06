@@ -28,7 +28,7 @@ public class CartaoService {
     @Autowired
     private CartaoRepository cartaoRepository;
     
-    public Cartao salvarCartao(Class<? extends Cartao> tipoCartao, String senha, Conta conta) {
+    public Cartao criarCartao(Class<? extends Cartao> tipoCartao, String senha, Conta conta) {
         Random random = new Random();
         if (CartaoCredito.class.equals(tipoCartao)) {
             CartaoCredito cartaoCredito = new CartaoCredito();

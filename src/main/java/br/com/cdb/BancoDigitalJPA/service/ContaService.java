@@ -36,7 +36,7 @@ public class ContaService {
     @Autowired
     private ContaRepository contaRepository;
 
-    public Conta salvarConta(Cliente cliente, TipoConta tipoConta, String chavePix, String senha) {
+    public Conta criarConta(Cliente cliente, TipoConta tipoConta, String chavePix, String senha) {
         Conta conta = new Conta();
         Random random = new Random();
         conta.setNumeroConta(random.nextLong((1 * Long.SIZE), Long.MAX_VALUE));

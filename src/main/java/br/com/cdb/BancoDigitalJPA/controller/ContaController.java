@@ -34,7 +34,7 @@ public class ContaController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addConta(@RequestBody Conta conta) {
-        Conta contaAdicionada = contaService.salvarConta(conta.getCliente(), conta.getTipoConta(), conta.getChavePix(), conta.getSenha());
+        Conta contaAdicionada = contaService.criarConta(conta.getCliente(), conta.getTipoConta(), conta.getChavePix(), conta.getSenha());
         if (contaAdicionada != null) {
             return new ResponseEntity<>("Conta adicionada com sucesso!",
                     HttpStatus.CREATED);
