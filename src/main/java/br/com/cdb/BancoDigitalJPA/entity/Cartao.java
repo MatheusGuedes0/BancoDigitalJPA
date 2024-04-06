@@ -31,9 +31,11 @@ public abstract class Cartao {
     private boolean ativo;
     private String senha;
     @ManyToOne
+    @JoinColumn(name = "conta_ID")
     private Conta conta;
 
     public Cartao() {
+        super();
     }
 
     public Cartao(Long id, Long numero, boolean ativo, String senha, Conta conta) {

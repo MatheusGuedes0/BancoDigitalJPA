@@ -9,9 +9,8 @@ package br.com.cdb.BancoDigitalJPA.entity;
  * @author mathe
  */
 public enum TipoSeguros {
-    FURTO("Seguro Furto"),
-    BOLSAPROTEGIDA("Seguro Bolsa Protegida"),
-    COACAO("Seguro de Saque Efetuado sob coação"),;
+    FRAUDE("Seguro Fraude"),
+    VIAGEM("Seguro Viagem");
 
     private String tipoSeguros;
 

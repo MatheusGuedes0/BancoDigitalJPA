@@ -4,6 +4,7 @@
  */
 package br.com.cdb.BancoDigitalJPA.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,9 +26,10 @@ public class Seguro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String numeroApolice;
+    private int numeroApolice; //declarando um int pois um nuemro de Apólice, pelas minhas pesquisas, são apenas de 7 digitos
     private LocalDate dataContratacao;
     private Double valorApolice;
+    @JsonDeserialize(as = CartaoCredito.class)
     @ManyToOne
     @JoinColumn(name = "cartao_ID")
     private Cartao cartao;
@@ -46,11 +48,11 @@ public class Seguro {
         this.id = id;
     }
 
-    public String getNumeroApolice() {
+    public int getNumeroApolice() {
         return numeroApolice;
     }
 
-    public void setNumeroApolice(String numeroApolice) {
+    public void setNumeroApolice(int numeroApolice) {
         this.numeroApolice = numeroApolice;
     }
 
@@ -85,11 +87,13 @@ public class Seguro {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
-    
-    
 
     public TipoSeguros getTipoSeguros() {
         return tipoSeguros;
+    }
+
+    public void setTipoSeguros(TipoSeguros tipoSeguros) {
+        this.tipoSeguros = tipoSeguros;
     }
 
 }

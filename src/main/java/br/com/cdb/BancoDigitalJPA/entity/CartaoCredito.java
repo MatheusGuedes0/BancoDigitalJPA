@@ -23,13 +23,14 @@ public class CartaoCredito extends Cartao {
     private double limiteDoCartao;
 
     public CartaoCredito() {
+        super();
     }
 
-    public CartaoCredito(Long id, Long numero, boolean ativo, String senha, Conta conta) {
+    public CartaoCredito(Long id, Long numero, boolean ativo, String senha, Conta conta, Date dataFatura, double limiteDoCartao) {
         super(id, numero, ativo, senha, conta);
+        this.dataFatura = dataFatura;
+        this.limiteDoCartao = limiteDoCartao;
     }
-    
- 
 
     public Date getDataFatura() {
         return dataFatura;

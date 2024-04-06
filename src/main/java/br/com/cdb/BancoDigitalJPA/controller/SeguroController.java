@@ -4,9 +4,11 @@
  */
 package br.com.cdb.BancoDigitalJPA.controller;
 
+import br.com.cdb.BancoDigitalJPA.entity.CartaoCredito;
 import br.com.cdb.BancoDigitalJPA.entity.Seguro;
 import br.com.cdb.BancoDigitalJPA.service.SeguroService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +30,13 @@ public class SeguroController {
     
     @PostMapping("/add")
     public ResponseEntity<String>contratarSeguro(@RequestBody Seguro seguro){
-        Seguro seguroAdicionado = seguroService.contratarSeguro();
+        Seguro seguroAdicionado = seguroService.contratarSeguro((CartaoCredito) seguro.getCartao(),seguro.getTipoSeguros());
+        
+        if(seguroAdicionado != null){
+            return new ResponseEntity<>("Seguro contratado com sucesso!", HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity<>("Um dos campos é invalido!", HttpStatus.NOT_ACCEPTABLE);
+        }
     }
     
 }
