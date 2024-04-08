@@ -6,6 +6,7 @@ package br.com.cdb.BancoDigitalJPA.service;
 
 import br.com.cdb.BancoDigitalJPA.entity.Cliente;
 import br.com.cdb.BancoDigitalJPA.entity.Conta;
+import br.com.cdb.BancoDigitalJPA.entity.TipoCliente;
 import br.com.cdb.BancoDigitalJPA.entity.TipoConta;
 import br.com.cdb.BancoDigitalJPA.exception.ChavePixNaoEncontradaException;
 import br.com.cdb.BancoDigitalJPA.exception.ContaNotFoundException;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,20 +56,46 @@ public class ContaService {
         return contaRepository.findAll();
     }
 
+    //Esse método funciona melhor em um sistema automatizado com classes ScheduledExecutorService
+    //Como o foco não é sistema automaziado, esse método via ser testado com outro método chamado no controller
+    //o método está por ultimo nessa classe
     public Conta adicionarTaxas(Long idConta) {
         Conta conta = contaRepository.findById(idConta).orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
         LocalDate dataInicioAtividades = conta.getDataCriacao();
         LocalDate today = LocalDate.now();
-        Period period = Period.between(dataInicioAtividades, today);
-        int diasCorridos = period.getDays();
+        
+        long diasCorridos = ChronoUnit.DAYS.between(dataInicioAtividades, today);
 
-        if (diasCorridos % 30 == 0 && conta.getTipoConta().equals(TipoConta.CONTACORRENTE)) {
-            conta.setSaldoConta(conta.getSaldoConta() - 22.90);
-        } else if (diasCorridos % 30 == 0 && conta.getTipoConta().equals(TipoConta.CONTAPOUPANCA)) {
-            conta.setSaldoConta(conta.getSaldoConta() + (conta.getSaldoConta() + 0.08));
+        if (diasCorridos % 30 == 0) {
+            if (conta.getTipoConta().equals(TipoConta.CONTACORRENTE)) {
+                if (conta.getCliente().getTipoCliente() == TipoCliente.COMUM) {
+                    conta.setSaldoConta(conta.getSaldoConta() - 12.00);
+                } else if (conta.getCliente().getTipoCliente() == TipoCliente.SUPER) {
+                    conta.setSaldoConta(conta.getSaldoConta() - 8.00);
+                }
+
+            } else if (conta.getTipoConta().equals(TipoConta.CONTAPOUPANCA)) {
+                double taxaJurosMensal = 0.08;
+                double rendimento = conta.getSaldoConta() * Math.pow(1 + taxaJurosMensal, 1) - conta.getSaldoConta();
+                conta.setSaldoConta(conta.getSaldoConta() + rendimento);
+            }
+        }
+        if (diasCorridos % 365 == 0) {
+            if (conta.getTipoConta().equals(TipoConta.CONTAPOUPANCA)) {
+                double taxaRendimentoAnual = 0.0;
+                if (conta.getCliente().getTipoCliente() == TipoCliente.COMUM) {
+                    taxaRendimentoAnual = 0.005;
+                } else if (conta.getCliente().getTipoCliente() == TipoCliente.SUPER) {
+                    taxaRendimentoAnual = 0.007;
+                } else if (conta.getCliente().getTipoCliente() == TipoCliente.PREMIUM) {
+                    taxaRendimentoAnual = 0.009;
+                }
+
+                double rendimentoAnual = conta.getSaldoConta() * Math.pow(1 + taxaRendimentoAnual, 1) - conta.getSaldoConta();
+                conta.setSaldoConta(conta.getSaldoConta() + rendimentoAnual);
+            }
         }
 
-        // Salva a conta atualizada no banco de dados
         return contaRepository.save(conta);
     }
 
@@ -97,14 +125,26 @@ public class ContaService {
 
     public Conta buscarContaPorNumero(Long numeroConta) {
         Conta conta = contaRepository.findByNumeroConta(numeroConta);
-        
-        if(conta != null){
+
+        if (conta != null) {
             return conta;
-        }else{
+        } else {
             throw new ContaNotFoundException("Conta não encontrada.");
         }
     }
-    
-    
-    
+
+    // esse método tem a função apenas de alterar a data inicial para pordermos testar a aplicação de taxas e juros
+    //do método adicionarTaxas(Long id) no método verificarDiasCorridosEAtualizarSaldo() do contaController
+    public Conta alteraDataConta(Long id, int dias) {
+        Optional<Conta> contaOptional = contaRepository.findById(id);
+        if (contaOptional.isPresent()) {
+            Conta conta = contaOptional.get();
+            LocalDate novaData = conta.getDataCriacao().plusDays(dias);
+            conta.setDataCriacao(novaData);
+            return contaRepository.save(conta);
+        } else {
+            throw new IllegalArgumentException("Conta não encontrada");
+        }
+    }
+
 }

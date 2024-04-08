@@ -9,10 +9,12 @@ import br.com.cdb.BancoDigitalJPA.entity.CartaoCredito;
 import br.com.cdb.BancoDigitalJPA.entity.CartaoDebito;
 import br.com.cdb.BancoDigitalJPA.exception.SenhaIncorretaException;
 import br.com.cdb.BancoDigitalJPA.service.CartaoService;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -130,6 +132,13 @@ public class CartaoController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
+    }
+    
+    @GetMapping("/aplicarTaxas")
+    public ResponseEntity<String> aplicarTaxas() {
+       cartaoService.aplicarTaxaSobreFatura();
+
+        return new ResponseEntity<>("Taxa aplicada com sucesso!", HttpStatus.OK);
     }
 
 }

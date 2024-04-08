@@ -8,6 +8,7 @@ import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,8 +31,8 @@ public abstract class Cartao {
     private Long numero;
     private boolean ativo;
     private String senha;
-    @ManyToOne
     @JoinColumn(name = "conta_ID")
+    @ManyToOne
     private Conta conta;
 
     public Cartao() {

@@ -8,6 +8,7 @@ package br.com.cdb.BancoDigitalJPA.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -38,8 +39,20 @@ public class Conta {
     private String senha;
 
     public Conta() {
+        super();
     }
 
+    public Conta(Long id, Long numeroConta, double saldoConta, Cliente cliente, TipoConta tipoConta, LocalDate dataCriacao, String chavePix, String senha) {
+        this.id = id;
+        this.numeroConta = numeroConta;
+        this.saldoConta = saldoConta;
+        this.cliente = cliente;
+        this.tipoConta = tipoConta;
+        this.dataCriacao = dataCriacao;
+        this.chavePix = chavePix;
+        this.senha = senha;
+    }
+    
     public Long getId() {
         return id;
     }

@@ -20,16 +20,21 @@ import java.util.Date;
 public class CartaoCredito extends Cartao {
 
     private Date dataFatura;
-    private double limiteDoCartao;
+    private double valorFatura;
+    private double limiteAtual;
+    private double limiteTotalDoCartao;
 
     public CartaoCredito() {
         super();
     }
 
-    public CartaoCredito(Long id, Long numero, boolean ativo, String senha, Conta conta, Date dataFatura, double limiteDoCartao) {
+    public CartaoCredito(Long id, Long numero, boolean ativo, String senha, Conta conta, Date dataFatura,
+            double valorFatura, double limiteAtual, double limiteTotalDoCartao) {
         super(id, numero, ativo, senha, conta);
         this.dataFatura = dataFatura;
-        this.limiteDoCartao = limiteDoCartao;
+        this.valorFatura = valorFatura;
+        this.limiteAtual = limiteAtual;
+        this.limiteTotalDoCartao = limiteTotalDoCartao;
     }
 
     public Date getDataFatura() {
@@ -40,12 +45,28 @@ public class CartaoCredito extends Cartao {
         this.dataFatura = dataFatura;
     }
 
-    public double getLimiteDoCartao() {
-        return limiteDoCartao;
+    public double getValorFatura() {
+        return valorFatura;
     }
 
-    public void setLimiteDoCartao(double limiteDoCartao) {
-        this.limiteDoCartao = limiteDoCartao;
+    public void setValorFatura(double valorFatura) {
+        this.valorFatura = valorFatura;
+    }
+
+    public double getLimiteAtual() {
+        return limiteAtual;
+    }
+
+    public void setLimiteAtual(double limiteAtual) {
+        this.limiteAtual = limiteAtual;
+    }
+
+    public double getLimiteTotalDoCartao() {
+        return limiteTotalDoCartao;
+    }
+
+    public void setLimiteTotalDoCartao(double limiteTotalDoCartao) {
+        this.limiteTotalDoCartao = limiteTotalDoCartao;
     }
 
 }

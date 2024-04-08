@@ -60,11 +60,27 @@ public class ContaController {
         return new ResponseEntity<List<Conta>>(conta, HttpStatus.OK);
     }
 
+    
+    //Esse método altera a data de criação da conta. O unico objetivo desse meétodo é o teste do
+    //método  verificarDiasCorridosEAtualizarSaldo()
+    //favor alterar o saldo inicial de conta para poder testar
+    @PostMapping("/alteraData")
+    public ResponseEntity<?> alteraData(@RequestBody Map<String, Object> request) {
+        Long id = Long.valueOf(String.valueOf(request.get("id")));
+        int dias = (int) request.get("dias");
+        try {
+            Conta conta = contaService.alteraDataConta(id, dias);
+            return ResponseEntity.ok(conta);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/trasferirPix")
     public ResponseEntity<?> transferirViaPix(@RequestBody Map<String, Object> request) {
         try {
             String chavePix = (String) request.get("chavePix");
-            Long numeroConta = Long.valueOf(String.valueOf(request.get("numeroConta")));
+            Long numeroConta = Long.parseLong(request.get("numeroConta").toString());
             String senha = (String) request.get("senha");
             double valor = Double.parseDouble(String.valueOf(request.get("valor")));
 

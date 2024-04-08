@@ -5,10 +5,16 @@
 package br.com.cdb.BancoDigitalJPA.service;
 
 import br.com.cdb.BancoDigitalJPA.entity.Cliente;
+import br.com.cdb.BancoDigitalJPA.entity.Endereco;
 import br.com.cdb.BancoDigitalJPA.entity.TipoCliente;
+import br.com.cdb.BancoDigitalJPA.exception.CpfDuplicadoException;
+import br.com.cdb.BancoDigitalJPA.exception.DataInvalidaException;
 import br.com.cdb.BancoDigitalJPA.repository.ClienteRepository;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,24 +23,33 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClienteService {
-    
+
     @Autowired
     private ClienteRepository clienteRepository;
-    
-    public Cliente salvarCliente(String nome, Long cpf, Long dataNascimento, String endereco, TipoCliente tipoCliente){
-        //VALIDAR OS CAMPOS
+
+    public Cliente salvarCliente(String nome, String cpf, LocalDate dataNascimento, String endereco, TipoCliente tipoCliente) {
         Cliente cliente = new Cliente();
-        cliente.setCpf(cpf);
         cliente.setNome(nome);
-        cliente.setDataNascimento(dataNascimento);
+        cliente.setCpf(cpf);
+        LocalDate dataAtual = LocalDate.now();
+        Period periodo = Period.between(dataNascimento, dataAtual);
+        int idade = periodo.getYears();
+        if (idade >= 18) {
+            cliente.setDataNascimento(dataNascimento);
+        } else {
+            throw new DataInvalidaException("O cliente deve ter pelo menos 18 anos de idade.");
+        }
+        
         cliente.setEndereco(endereco);
         cliente.setTipoCliente(tipoCliente);
-        
-        return clienteRepository.save(cliente);
+        try {
+            return clienteRepository.save(cliente);
+        } catch (DataIntegrityViolationException e) {
+            throw new CpfDuplicadoException("CPF já cadastrado!");
+        }
     }
-    
-    
-    public List<Cliente>getClientes(){
+
+    public List<Cliente> getClientes() {
         return clienteRepository.findAll();
     }
 }

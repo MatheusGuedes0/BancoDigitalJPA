@@ -4,13 +4,23 @@
  */
 package br.com.cdb.BancoDigitalJPA.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -18,22 +28,32 @@ import java.util.Date;
  */
 @Entity
 public class Cliente {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Pattern(regexp = "^[a-zA-ZÀ-ú\\s]*$", message = "O nome deve conter apenas letras e espaços")
+    @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres")
     private String nome;
-    private Long cpf;
-    private Long dataNascimento;
-    private String endereco;
+
+    @Column(unique = true)
+    @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "Formato de CPF inválido")
+    private String cpf;
+
+    @NotNull(message = "A data de nascimento não pode estar vazia")
+    @Past(message = "A data de nascimento deve ser no passado")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate dataNascimento;
     
-     @Enumerated(EnumType.STRING)
+    private String endereco;
+
+    @Enumerated(EnumType.STRING)
     private TipoCliente tipoCliente;
 
     public Cliente() {
     }
-    
-   
+
     public Long getId() {
         return id;
     }
@@ -41,8 +61,7 @@ public class Cliente {
     public void setId(Long id) {
         this.id = id;
     }
-    
-    
+
     public String getNome() {
         return nome;
     }
@@ -51,19 +70,19 @@ public class Cliente {
         this.nome = nome;
     }
 
-    public Long getCpf() {
+    public String getCpf() {
         return cpf;
     }
 
-    public void setCpf(Long cpf) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
-    public Long getDataNascimento() {
+    public LocalDate getDataNascimento() {
         return dataNascimento;
     }
 
-    public void setDataNascimento(Long dataNascimento) {
+    public void setDataNascimento(LocalDate dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
 
@@ -82,9 +101,5 @@ public class Cliente {
     public void setTipoCliente(TipoCliente tipoCliente) {
         this.tipoCliente = tipoCliente;
     }
-    
-    
-    
-    
-    
+
 }
