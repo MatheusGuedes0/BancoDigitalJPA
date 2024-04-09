@@ -13,6 +13,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -38,15 +41,17 @@ public class Cliente {
     private String nome;
 
     @Column(unique = true)
-    @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "Formato de CPF inválido")
+    @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")
     private String cpf;
 
     @NotNull(message = "A data de nascimento não pode estar vazia")
     @Past(message = "A data de nascimento deve ser no passado")
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataNascimento;
-    
-    private String endereco;
+
+    @ManyToOne
+    @JoinColumn(name = "endereco_ID")
+    private Endereco endereco;
 
     @Enumerated(EnumType.STRING)
     private TipoCliente tipoCliente;
@@ -86,11 +91,11 @@ public class Cliente {
         this.dataNascimento = dataNascimento;
     }
 
-    public String getEndereco() {
+    public Endereco getEndereco() {
         return endereco;
     }
 
-    public void setEndereco(String endereco) {
+    public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
 

@@ -6,32 +6,51 @@ package br.com.cdb.BancoDigitalJPA.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 /**
  *
  * @author mathe
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
 public class Endereco {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Pattern(regexp = "\\d{5}-\\d{3}")
+    private String cep;
+
     private String rua;
-    private int numero;
+    private Integer numero;
     private String complemento;
     private String cidade;
     private String estado;
-    private String cep;
 
     public Endereco() {
     }
 
-    public Endereco(String rua, int numero, String complemento, String cidade, String estado, String cep) {
+    public Endereco(Long id, String cep, String rua, Integer numero, String complemento, String cidade, String estado) {
+        this.id = id;
+        this.cep = cep;
         this.rua = rua;
         this.numero = numero;
         this.complemento = complemento;
         this.cidade = cidade;
         this.estado = estado;
-        this.cep = cep;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getRua() {
@@ -42,11 +61,11 @@ public class Endereco {
         this.rua = rua;
     }
 
-    public int getNumero() {
+    public Integer getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(Integer numero) {
         this.numero = numero;
     }
 
@@ -78,7 +97,7 @@ public class Endereco {
         return cep;
     }
 
-    public void setCeo(String cep) {
+    public void setCep(String cep) {
         this.cep = cep;
     }
 

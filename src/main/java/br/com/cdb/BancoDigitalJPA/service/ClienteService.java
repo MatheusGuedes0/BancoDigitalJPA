@@ -10,6 +10,7 @@ import br.com.cdb.BancoDigitalJPA.entity.TipoCliente;
 import br.com.cdb.BancoDigitalJPA.exception.CpfDuplicadoException;
 import br.com.cdb.BancoDigitalJPA.exception.DataInvalidaException;
 import br.com.cdb.BancoDigitalJPA.repository.ClienteRepository;
+import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -27,7 +28,7 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    public Cliente salvarCliente(String nome, String cpf, LocalDate dataNascimento, String endereco, TipoCliente tipoCliente) {
+    public Cliente salvarCliente(String nome, String cpf, LocalDate dataNascimento,  Endereco endereco, TipoCliente tipoCliente) {
         Cliente cliente = new Cliente();
         cliente.setNome(nome);
         cliente.setCpf(cpf);
@@ -39,13 +40,15 @@ public class ClienteService {
         } else {
             throw new DataInvalidaException("O cliente deve ter pelo menos 18 anos de idade.");
         }
+            cliente.setEndereco(endereco);
         
-        cliente.setEndereco(endereco);
         cliente.setTipoCliente(tipoCliente);
         try {
             return clienteRepository.save(cliente);
         } catch (DataIntegrityViolationException e) {
             throw new CpfDuplicadoException("CPF já cadastrado!");
+        }catch(ConstraintViolationException e){
+            throw new ConstraintViolationException("CPF inválido(XXX.XXX.XXX-XX)", e.getConstraintViolations());
         }
     }
 
