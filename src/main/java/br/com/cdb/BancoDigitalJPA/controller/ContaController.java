@@ -5,6 +5,7 @@
 package br.com.cdb.BancoDigitalJPA.controller;
 
 import br.com.cdb.BancoDigitalJPA.entity.Conta;
+import br.com.cdb.BancoDigitalJPA.exception.ContaNotFoundException;
 import br.com.cdb.BancoDigitalJPA.exception.SaldoInsuficienteException;
 import br.com.cdb.BancoDigitalJPA.exception.SenhaIncorretaException;
 
@@ -60,7 +61,6 @@ public class ContaController {
         return new ResponseEntity<List<Conta>>(conta, HttpStatus.OK);
     }
 
-    
     //Esse método altera a data de criação da conta. O unico objetivo desse meétodo é o teste do
     //método  verificarDiasCorridosEAtualizarSaldo()
     //favor alterar o saldo inicial de conta para poder testar
@@ -80,12 +80,13 @@ public class ContaController {
     public ResponseEntity<?> transferirViaPix(@RequestBody Map<String, Object> request) {
         try {
             String chavePix = (String) request.get("chavePix");
-            Long numeroConta = Long.parseLong(request.get("numeroConta").toString());
+            Long id = Long.parseLong(request.get("id").toString());
             String senha = (String) request.get("senha");
             double valor = Double.parseDouble(String.valueOf(request.get("valor")));
 
-            Conta contaDestino = contaService.transferirViaPix(numeroConta, chavePix, valor, senha);
-            return ResponseEntity.ok(contaDestino);
+            Conta contaDestino = contaService.transferirViaPix(id, chavePix, valor, senha);
+            return new ResponseEntity<>("Pix de R$ " + valor + " enviado com sucesso!",
+                    HttpStatus.OK);
         } catch (SaldoInsuficienteException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (SenhaIncorretaException e) {
@@ -96,16 +97,16 @@ public class ContaController {
     @PostMapping("/saldo")
     public ResponseEntity<?> getSaldo(@RequestBody Map<String, Object> request) {
         try {
-            Long numeroConta = Long.valueOf(String.valueOf(request.get("numeroConta")));
+            Long id = Long.valueOf(String.valueOf(request.get("id")));
             String senha = (String) request.get("senha");
 
-            Conta conta = contaService.buscarContaPorNumero(numeroConta);
+            Conta conta = contaService.findOne(id);
             if (conta.getSenha().equals(senha)) {
                 return ResponseEntity.ok(conta.getSaldoConta());
             } else {
                 return ResponseEntity.badRequest().body("Senha incorreta.");
             }
-        } catch (NumberFormatException e) {
+        } catch (ContaNotFoundException e) {
             return ResponseEntity.badRequest().body("Número da conta inválido.");
         }
     }

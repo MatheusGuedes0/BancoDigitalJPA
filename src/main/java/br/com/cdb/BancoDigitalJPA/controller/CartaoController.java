@@ -36,7 +36,7 @@ public class CartaoController {
 
         Cartao cartaoAdicionado = cartaoService.criarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
         if (cartaoAdicionado != null) {
-            return new ResponseEntity<>("Conta adicionada com sucesso!",
+            return new ResponseEntity<>("Cartão de Crédito adicionado com sucesso!",
                     HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Um dos campos da conta é inválido!",
@@ -49,7 +49,7 @@ public class CartaoController {
 
         Cartao cartaoAdicionado = cartaoService.criarCartao(cartao.getClass(), cartao.getSenha(), cartao.getConta());
         if (cartaoAdicionado != null) {
-            return new ResponseEntity<>("Conta adicionada com sucesso!",
+            return new ResponseEntity<>("Cartão de Débito adicionado com sucesso!",
                     HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Um dos campos da conta é inválido!",
@@ -59,12 +59,12 @@ public class CartaoController {
 
     @PostMapping("/pagarNoCredito")
     public ResponseEntity<String> pagarNoCredito(@RequestBody Map<String, Object> request) {
-        Long numeroCartao = (Long) request.get("numero");
+        Long id = Long.parseLong(request.get("id").toString());
         String senhaCartao = (String) request.get("senha");
         String numeroBoleto = (String) request.get("numeroBoleto");
 
         try {
-            CartaoCredito cartaoCredito = (CartaoCredito) cartaoService.realizarPagamentos(numeroCartao, senhaCartao, numeroBoleto);
+            CartaoCredito cartaoCredito = (CartaoCredito) cartaoService.realizarPagamentos(id, senhaCartao, numeroBoleto);
             return new ResponseEntity<>("pagamento realizado com sucesso!", HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
@@ -73,12 +73,12 @@ public class CartaoController {
 
     @PostMapping("/pagarNoDebito")
     public ResponseEntity<String> pagarNoDebito(@RequestBody Map<String, Object> request) {
-        Long numeroCartao = (Long) request.get("numero");
+        Long id = Long.parseLong(request.get("id").toString());
         String senhaCartao = (String) request.get("senha");
         String numeroBoleto = (String) request.get("numeroBoleto");
 
         try {
-            CartaoDebito cartaoDebito = (CartaoDebito) cartaoService.realizarPagamentos(numeroCartao, senhaCartao, numeroBoleto);
+            CartaoDebito cartaoDebito = (CartaoDebito) cartaoService.realizarPagamentos(id, senhaCartao, numeroBoleto);
             return new ResponseEntity<>("pagamento realizado com sucesso!", HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
@@ -133,10 +133,10 @@ public class CartaoController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
-    
+
     @GetMapping("/aplicarTaxas")
     public ResponseEntity<String> aplicarTaxas() {
-       cartaoService.aplicarTaxaSobreFatura();
+        cartaoService.aplicarTaxaSobreFatura();
 
         return new ResponseEntity<>("Taxa aplicada com sucesso!", HttpStatus.OK);
     }

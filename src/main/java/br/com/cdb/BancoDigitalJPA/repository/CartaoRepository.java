@@ -15,5 +15,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartaoRepository extends JpaRepository<Cartao, Long>{
      
-    Cartao findByNumero(Long numeroCartao);
 }

@@ -42,7 +42,7 @@ public class ContaService {
         Conta conta = new Conta();
         Random random = new Random();
         conta.setNumeroConta(random.nextLong((1 * Long.SIZE), Long.MAX_VALUE));
-        conta.setSaldoConta(0);
+        conta.setSaldoConta(1110);
         conta.setCliente(cliente);
         conta.setTipoConta(tipoConta);
         LocalDate today = LocalDate.now();
@@ -63,7 +63,7 @@ public class ContaService {
         Conta conta = contaRepository.findById(idConta).orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
         LocalDate dataInicioAtividades = conta.getDataCriacao();
         LocalDate today = LocalDate.now();
-        
+
         long diasCorridos = ChronoUnit.DAYS.between(dataInicioAtividades, today);
 
         if (diasCorridos % 30 == 0) {
@@ -99,34 +99,40 @@ public class ContaService {
         return contaRepository.save(conta);
     }
 
-    public Conta transferirViaPix(Long numeroConta, String chavePix, double valor, String senha) {
-        Conta contaOrigem = contaRepository.findByNumeroConta(numeroConta);
-        if (contaOrigem.getSenha().equals(senha)) {
+    public Conta transferirViaPix(Long idConta, String chavePix, double valor, String senha) {
+        Optional<Conta> contaOptional = contaRepository.findById(idConta);
+        if (contaOptional.isPresent()) {
 
-            if (contaOrigem.getSaldoConta() >= valor) {
-                Conta contaDestino = contaRepository.findByChavePix(chavePix);
-                if (contaDestino != null) {
+            Conta contaOrigem = contaOptional.get();
+            if (contaOrigem.getSenha().equals(senha)) {
 
-                    contaDestino.setSaldoConta(contaDestino.getSaldoConta() + valor);
-                    contaOrigem.setSaldoConta(contaOrigem.getSaldoConta() - valor);
-                    contaRepository.save(contaOrigem);
-                    return contaRepository.save(contaDestino);
+                if (contaOrigem.getSaldoConta() >= valor) {
+                    Conta contaDestino = contaRepository.findByChavePix(chavePix);
+                    if (contaDestino != null) {
+
+                        contaDestino.setSaldoConta(contaDestino.getSaldoConta() + valor);
+                        contaOrigem.setSaldoConta(contaOrigem.getSaldoConta() - valor);
+                        contaRepository.save(contaOrigem);
+                        return contaRepository.save(contaDestino);
+                    } else {
+                        throw new ChavePixNaoEncontradaException("Chave pix não encontrada!");
+                    }
                 } else {
-                    throw new ChavePixNaoEncontradaException("Chave pix não encontrada!");
+                    throw new SaldoInsuficienteException("Saldo insuficiente para realizar a transferência");
                 }
             } else {
-                throw new SaldoInsuficienteException("Saldo insuficiente para realizar a transferência");
+                throw new SenhaIncorretaException("Senha incorreta, impossivel realizar trasferência!");
             }
         } else {
-            throw new SenhaIncorretaException("Senha incorreta, impossivel realizar trasferência!");
-
+            throw new ContaNotFoundException("Conta não encontrada!");
         }
     }
 
-    public Conta buscarContaPorNumero(Long numeroConta) {
-        Conta conta = contaRepository.findByNumeroConta(numeroConta);
-
-        if (conta != null) {
+    public Conta findOne(Long id) {
+        Optional<Conta> contaOptional = contaRepository.findById(id);
+        
+        if (contaOptional.isPresent()) {
+            Conta conta = contaOptional.get();
             return conta;
         } else {
             throw new ContaNotFoundException("Conta não encontrada.");

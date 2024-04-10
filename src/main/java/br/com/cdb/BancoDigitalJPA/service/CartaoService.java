@@ -78,51 +78,61 @@ public class CartaoService {
         }
     }
 
-    public Cartao realizarPagamentos(Long numeroCartao, String senha, String numeroBoleto) {
-        Cartao cartao = cartaoRepository.findByNumero(numeroCartao);
-        // Nessa classe, implementariamos uma função de pagar algo a partir de uma requisição externa
-        // com o número do boleto. Como não aprendemos a fazer isso, o metodo realizarPagamentos
-        // apenas simula um pagamento.
-        // Boleto boleto = boleto.buscarBoleto(numeroBoleto); // constroiria o objeto boleto a partir do numero
-        // double valor = boleto.getValor(); // pegaria o valor do metodo construido
-        double valor = 800; // simulando o valor de um boleto
+    public Cartao realizarPagamentos(Long id, String senha, String numeroBoleto) {
+        Optional<Cartao> cartaoOptional = cartaoRepository.findById(id);
 
-        // Estou ciente de que aqui precisa de uma implementação mais elaborada com Token usando Spring Security
-        // Como não aprendemos no curso sobre token, achei melhor deixar em implementação simples
-        // para evitar classes JWT's que não foram requeridas no projeto final
-        if (cartao instanceof CartaoCredito) {
-            CartaoCredito cartaoCredito = (CartaoCredito) cartaoRepository.findByNumero(numeroCartao);
-            if (cartaoCredito.getSenha().equals(senha)) {
-                if (valor <= cartaoCredito.getLimiteAtual() && cartaoCredito.isAtivo()) {
-                    cartaoCredito.setLimiteAtual(cartaoCredito.getLimiteAtual() - valor);
-                    cartaoCredito.setValorFatura(cartaoCredito.getValorFatura() + valor);
-                    if (cartaoCredito.getLimiteAtual() == 0) {
-                        cartaoCredito.setAtivo(false);
+        if (cartaoOptional.isPresent()) {
+
+            Cartao cartao = cartaoOptional.get();
+            // Nessa classe, implementariamos uma função de pagar algo a partir de uma requisição externa
+            // com o número do boleto. Como não aprendemos a fazer isso, o metodo realizarPagamentos
+            // apenas simula um pagamento.
+            // Boleto boleto = boleto.buscarBoleto(numeroBoleto); // constroiria o objeto boleto a partir do numero
+            // double valor = boleto.getValor(); // pegaria o valor do metodo construido
+            double valor = 800; // simulando o valor de um boleto
+
+            // Estou ciente de que aqui precisa de uma implementação mais elaborada com Token usando Spring Security
+            // Como não aprendemos no curso sobre token, achei melhor deixar em implementação simples
+            // para evitar classes JWT's que não foram requeridas no projeto final
+            if (cartao instanceof CartaoCredito) {
+                Optional<Cartao> cartaoCreditoOptional = cartaoRepository.findById(id);
+                
+                CartaoCredito cartaoCredito = (CartaoCredito) cartaoCreditoOptional.get();
+                if (cartaoCredito.getSenha().equals(senha)) {
+                    if (valor <= cartaoCredito.getLimiteAtual() && cartaoCredito.isAtivo()) {
+                        cartaoCredito.setLimiteAtual(cartaoCredito.getLimiteAtual() - valor);
+                        cartaoCredito.setValorFatura(cartaoCredito.getValorFatura() + valor);
+                        if (cartaoCredito.getLimiteAtual() == 0) {
+                            cartaoCredito.setAtivo(false);
+                        }
+                        return cartaoRepository.save(cartaoCredito);
+                    } else {
+                        throw new RuntimeException("Limite do Cartão atingido!");
                     }
-                    return cartaoRepository.save(cartaoCredito);
                 } else {
-                    throw new RuntimeException("Limite do Cartão atingido!");
+                    throw new RuntimeException("Senha incorreta, impossível realizar pagamento!");
                 }
             } else {
-                throw new RuntimeException("Senha incorreta, impossível realizar pagamento!");
+                Optional<Cartao> cartaoDebitoOptional =  cartaoRepository.findById(id);
+                CartaoDebito cartaoDebito = (CartaoDebito) cartaoDebitoOptional.get();
+                if (cartaoDebito.getSenha().equals(senha)) {
+                    if (valor <= cartaoDebito.getConta().getSaldoConta() && cartaoDebito.getLimiteDiario() >= valor) {
+                        cartaoDebito.getConta().setSaldoConta(cartaoDebito.getConta().getSaldoConta() - valor);
+
+                        //Aqui seria bom implementar o histórico de transações do dia para que o limiteDiário voltasse toda vez que desse
+                        //24 horas. Como não estamos trabalhando com automações de software, ele desconta o militeDiário
+                        //ignorando os dias
+                        cartaoDebito.setLimiteDiario(cartaoDebito.getLimiteDiario() - valor);
+                        return cartaoRepository.save(cartaoDebito);
+                    } else {
+                        throw new RuntimeException("Saldo insuficiente ou limite diário excedido!");
+                    }
+                } else {
+                    throw new RuntimeException("Senha incorreta, impossível realizar pagamento!");
+                }
             }
         } else {
-            CartaoDebito cartaoDebito = (CartaoDebito) cartaoRepository.findByNumero(numeroCartao);
-            if (cartaoDebito.getSenha().equals(senha)) {
-                if (valor <= cartaoDebito.getConta().getSaldoConta() && cartaoDebito.getLimiteDiario() <= valor) {
-                    cartaoDebito.getConta().setSaldoConta(cartaoDebito.getConta().getSaldoConta() - valor);
-
-                    //Aqui seria bom implementar o histórico de transações do dia para que o limiteDiário voltasse toda vez que desse
-                    //24 horas. Como não estamos trabalhando com automações de software, ele desconta o militeDiário
-                    //ignorando os dias
-                    cartaoDebito.setLimiteDiario(cartaoDebito.getLimiteDiario() - valor);
-                    return cartaoRepository.save(cartaoDebito);
-                } else {
-                    throw new RuntimeException("Saldo insuficiente ou limite diário excedido!");
-                }
-            } else {
-                throw new RuntimeException("Senha incorreta, impossível realizar pagamento!");
-            }
+            throw new RuntimeException("Cartão não encontrado!");
         }
     }
 
